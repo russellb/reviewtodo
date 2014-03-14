@@ -66,13 +66,13 @@ def patch_set_approved(patch_set):
 
 def print_change(change):
     print ' --> %s (%s)' % (change['commitMessage'].split('\n')[0],
-            change.get('topic'))
+                            change.get('topic'))
     print ' ------> %s' % change['url']
 
 
 def print_review_todo(options):
     changes = get_changes([options.project], options.user, options.key,
-            options.server)
+                          options.server)
 
     backburner = []
     todo = []
