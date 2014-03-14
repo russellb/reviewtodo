@@ -141,9 +141,6 @@ def main(argv=None):
     optparser.add_option(
         '-k', '--key', default=None, help='ssh key for gerrit')
     optparser.add_option(
-        '-s', '--starred', action='store_true',
-        help='Include starred changes that have not been reviewed yet.')
-    optparser.add_option(
         '--server', default='review.openstack.org',
         help='Gerrit server to connect to')
 
