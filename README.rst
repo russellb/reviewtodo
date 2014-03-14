@@ -23,3 +23,14 @@ Reviews on your to-do list fit the following criteria:
 Note that one of the key things *not* included in your to-do list are reviews
 where someone added you to the review, but you haven't actually touched it yet.
 This is one of the key things that makes your review list in gerrit less useful.
+
+Examples
+--------
+
+Get a review to-do list across all projects::
+
+  $ reviewtodo -u russellb
+
+Get a review to-do list for a single project::
+
+  $ reviewtodo -u russellb -p openstack/nova
