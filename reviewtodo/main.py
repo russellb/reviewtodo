@@ -80,6 +80,9 @@ def print_review_todo(options):
         if change['status'] != 'NEW':
             # Filter out WORKINPROGRESS
             continue
+        if change['owner']['username'] == options.user:
+            # Ignore your own changes
+            continue
         latest_patch = change['patchSets'][-1]
         if patch_set_approved(latest_patch):
             # Ignore patches already approved and just waiting to merge
