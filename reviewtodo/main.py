@@ -128,10 +128,11 @@ def print_review_todo(options):
     for change in todo:
         print_change(change)
 
-    print
-    print 'Active reviews that do not need attention:'
-    for change in backburner:
-        print_change(change)
+    if options.full:
+        print
+        print 'Active reviews that do not need attention:'
+        for change in backburner:
+            print_change(change)
 
 
 def main(argv=None):
@@ -149,6 +150,10 @@ def main(argv=None):
     optparser.add_option(
         '--server', default='review.openstack.org',
         help='Gerrit server to connect to')
+    optparser.add_option(
+        '-f', '--full', action='store_true',
+        help='Show full output, including list of reviews that do not '
+             'currently need any attention.')
 
     options, args = optparser.parse_args()
 
