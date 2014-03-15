@@ -39,8 +39,7 @@ def get_changes(projects, gerrit_user, ssh_key, server):
                 client.connect(server, port=29418,
                                key_filename=ssh_key, username=gerrit_user)
                 cmd = ('gerrit query %s --all-approvals --patch-sets '
-                       '--commit-message --format JSON '
-                       'status:open reviewer:%s' %
+                       '--format JSON status:open reviewer:%s' %
                        (('project:%s' % project) if project else '',
                         gerrit_user))
                 if changes:
@@ -65,8 +64,7 @@ def patch_set_approved(patch_set):
 
 
 def print_change(change):
-    print ' --> %s (%s)' % (change['commitMessage'].split('\n')[0],
-                            change.get('topic'))
+    print ' --> %s (%s)' % (change['subject'], change.get('topic'))
     print ' ------> %s' % change['url']
 
 
