@@ -53,12 +53,23 @@ def get_from_gerrit(query, gerrit_user, ssh_key, server):
     return changes
 
 
-def get_changes(projects, gerrit_user, ssh_key, server):
+def projects_q(projects):
+    return ('(' +
+            ' OR '.join(['project:' + p for p in projects]) +
+            ')')
+
+
+def get_changes(project, all_from, gerrit_user, ssh_key, server):
     changes = []
-    for project in projects:
-        query = '%s status:open reviewer:%s' % (
-                ('project:%s' % project) if project else '', gerrit_user)
+
+    query = '%s status:open reviewer:%s' % (
+            ('project:%s' % project) if project else '', gerrit_user)
+    changes.extend(get_from_gerrit(query, gerrit_user, ssh_key, server))
+
+    if all_from:
+        query = '%s status:open' % (projects_q(all_from))
         changes.extend(get_from_gerrit(query, gerrit_user, ssh_key, server))
+
     return changes
 
 
@@ -76,11 +87,14 @@ def print_change(change):
 
 
 def print_review_todo(options):
-    changes = get_changes([options.project], options.user, options.key,
-                          options.server)
+    all_from_projects = options.all_from.split(',')
+
+    changes = get_changes(options.project, all_from_projects, options.user,
+                          options.key, options.server)
 
     backburner = []
     todo = []
+
 
     for change in changes:
         if 'rowCount' in change:
@@ -104,10 +118,12 @@ def print_review_todo(options):
                     break
             if reviewed:
                 break
-        if not reviewed:
+        if not reviewed and change['project'] not in all_from_projects:
             # Ignore changes where this user has not actually reviewed it.
             # This catches the case where someone else adds you to a review.
             # Just anyone shouldn't be able to put stuff on your todo list.
+            # The exception is projects you have specifically listed to see all
+            # changes from that you haven't reviewed.
             continue
 
         waiting_for_review = True
@@ -148,6 +164,11 @@ def main(argv=None):
     optparser.add_option(
         '-p', '--project', default='',
         help='Only show reviews for a specific project')
+    optparser.add_option(
+        '-a', '--all-from', default='',
+        help='A comma separated list of projects. List all changes from '
+             'these projects that you have not voted on. Useful for '
+             'smaller projects you want to see all changes for.')
     optparser.add_option(
         '-u', '--user', default=getpass.getuser(), help='gerrit user')
     optparser.add_option(

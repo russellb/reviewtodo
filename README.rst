@@ -34,3 +34,8 @@ Get a review to-do list across all projects::
 Get a review to-do list for a single project::
 
   $ reviewtodo -u russellb -p openstack/nova
+
+Get a to-do list across all projects, but list every review you have not voted
+in for a subset of projects::
+
+  $ reviewtodo -u russellb -a openstack/governance,openstack-infra/reviewstats
