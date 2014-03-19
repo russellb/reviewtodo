@@ -24,41 +24,42 @@ import sys
 import paramiko
 
 
-def get_changes(projects, gerrit_user, ssh_key, server):
-    all_changes = []
+def get_from_gerrit(query, gerrit_user, ssh_key, server):
+    changes = []
 
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+    while True:
+        try:
+            client.connect(server, port=29418,
+                           key_filename=ssh_key, username=gerrit_user)
+        except paramiko.SSHException:
+            # retry with allow_agent=False if initial connect fails.
+            client.connect(server, port=29418,
+                           key_filename=ssh_key, username=gerrit_user,
+                           allow_agent=False)
+        cmd = ('gerrit query --all-approvals --patch-sets '
+               '--format JSON %s' % query)
+        if changes:
+            cmd += ' resume_sortkey:%s' % changes[-2]['sortKey']
+        stdin, stdout, stderr = client.exec_command(cmd)
+        for l in stdout:
+            changes += [json.loads(l)]
+        if changes[-1]['rowCount'] == 0:
+            break
+
+    return changes
+
+
+def get_changes(projects, gerrit_user, ssh_key, server):
+    changes = []
     for project in projects:
-        changes = []
-
-        if not changes:
-            while True:
-                try:
-                    client.connect(server, port=29418,
-                                   key_filename=ssh_key, username=gerrit_user)
-                except paramiko.SSHException:
-                    # retry with allow_agent=False if initial connect fails.
-                    client.connect(server, port=29418,
-                                   key_filename=ssh_key, username=gerrit_user,
-                                   allow_agent=False)
-                cmd = ('gerrit query %s --all-approvals --patch-sets '
-                       '--format JSON status:open reviewer:%s' %
-                       (('project:%s' % project) if project else '',
-                        gerrit_user))
-                if changes:
-                    cmd += ' resume_sortkey:%s' % changes[-2]['sortKey']
-                stdin, stdout, stderr = client.exec_command(cmd)
-                for l in stdout:
-                    changes += [json.loads(l)]
-                if changes[-1]['rowCount'] == 0:
-                    break
-
-        all_changes.extend(changes)
-
-    return all_changes
+        query = '%s status:open reviewer:%s' % (
+                ('project:%s' % project) if project else '', gerrit_user)
+        changes.extend(get_from_gerrit(query, gerrit_user, ssh_key, server))
+    return changes
 
 
 def patch_set_approved(patch_set):
