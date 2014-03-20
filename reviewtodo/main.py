@@ -94,9 +94,8 @@ def print_review_todo(options):
     changes = get_changes(options.project, all_from_projects, options.user,
                           options.key, options.server)
 
-    backburner = []
-    todo = []
-
+    backburner = {}
+    todo = {}
 
     for change in changes:
         if 'rowCount' in change:
@@ -143,18 +142,18 @@ def print_review_todo(options):
                 waiting_for_review = False
                 break
         if not waiting_for_review or already_reviewed_latest:
-            backburner.append(change)
+            backburner[change['number']] = change
         else:
-            todo.append(change)
+            todo[change['number']] = change
 
     print 'Reviews to-do:'
-    for change in todo:
+    for change in todo.itervalues():
         print_change(change)
 
     if options.full:
         print
         print 'Active reviews that do not need attention:'
-        for change in backburner:
+        for change in backburner.itervalues():
             print_change(change)
 
 
