@@ -88,6 +88,8 @@ def print_change(change):
 
 def print_review_todo(options):
     all_from_projects = options.all_from.split(',')
+    if len(all_from_projects) == 1 and all_from_projects[0] == '':
+        all_from_projects = []
 
     changes = get_changes(options.project, all_from_projects, options.user,
                           options.key, options.server)
