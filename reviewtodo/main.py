@@ -146,9 +146,12 @@ def print_review_todo(options):
         else:
             todo[change['number']] = change
 
-    print 'Reviews to-do:'
-    for change in todo.itervalues():
-        print_change(change)
+    if not todo:
+        print 'You\'re caught up on reviews! \o/'
+    else:
+        print 'Reviews to-do:'
+        for change in todo.itervalues():
+            print_change(change)
 
     if options.full:
         print
