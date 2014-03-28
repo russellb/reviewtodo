@@ -82,7 +82,8 @@ def patch_set_approved(patch_set):
 
 
 def print_change(change):
-    print ' --> %s (%s)' % (change['subject'], change.get('topic'))
+    print ' --> %s (%s %s (%s))' % (change['subject'], change['project'],
+                                    change['branch'], change.get('topic'))
     print ' ------> %s' % change['url']
 
 
