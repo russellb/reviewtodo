@@ -115,7 +115,7 @@ def print_review_todo(options):
         reviewed = False
         for patch in change['patchSets']:
             for review in patch.get('approvals', []):
-                if review['by']['username'] == options.user:
+                if review['by'].get('username', 'unknown') == options.user:
                     reviewed = True
                     break
             if reviewed:
