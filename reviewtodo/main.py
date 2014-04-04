@@ -82,8 +82,9 @@ def patch_set_approved(patch_set):
 
 
 def print_change(change):
-    print ' --> %s [%s %s (%s)]' % (change['subject'], change['project'],
-                                    change['branch'], change.get('topic'))
+    print ' --> %s [%s (%s)]' % (change['subject'],
+                                 change['branch'],
+                                 change.get('topic'))
     print ' ------> %s' % change['url']
 
 
@@ -145,14 +146,18 @@ def print_review_todo(options):
         if not waiting_for_review or already_reviewed_latest:
             backburner[change['number']] = change
         else:
-            todo[change['number']] = change
+            todo.setdefault(change['project'], {})
+            todo[change['project']][change['number']] = change
 
     if not todo:
         print 'You\'re caught up on reviews! \o/'
     else:
-        print 'Reviews to-do:'
-        for change in todo.itervalues():
-            print_change(change)
+        print 'Reviews to-do:\n'
+        for project, changes in todo.iteritems():
+            print 'Project: %s' % project
+            for change in changes.itervalues():
+                print_change(change)
+            print
 
     if options.full:
         print
