@@ -137,7 +137,7 @@ def print_review_todo(options):
             if review['type'] not in ('CRVW', 'VRIF',
                                       'Code-Review', 'Verified'):
                 continue
-            if review['by']['username'] == options.user:
+            if review['by'].get('username') == options.user:
                 already_reviewed_latest = True
                 break
             if review['value'] in ('-1', '-2'):
