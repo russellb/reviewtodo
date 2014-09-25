@@ -133,7 +133,11 @@ def print_review_todo(options):
         approvals = latest_patch.get('approvals', [])
         approvals.sort(key=lambda a: a['grantedOn'])
         already_reviewed_latest = False
+        last_workflow_review = '0'
         for review in approvals:
+            if review['type'] == 'Workflow':
+                last_workflow_review = review['value']
+                continue
             if review['type'] not in ('CRVW', 'VRIF',
                                       'Code-Review', 'Verified'):
                 continue
@@ -143,7 +147,8 @@ def print_review_todo(options):
             if review['value'] in ('-1', '-2'):
                 waiting_for_review = False
                 break
-        if not waiting_for_review or already_reviewed_latest:
+        if (not waiting_for_review or already_reviewed_latest or
+                last_workflow_review == '-1'):
             backburner[change['number']] = change
         else:
             todo.setdefault(change['project'], {})
