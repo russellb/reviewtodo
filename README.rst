@@ -5,7 +5,7 @@ reviewtodo
 Review to-do list generator.
 
 * Free software: Apache license
-* Documentation: http://docs.openstack.org/developer/reviewtodo
+* https://github.com/russellb/reviewtodo
 
 Features
 --------
